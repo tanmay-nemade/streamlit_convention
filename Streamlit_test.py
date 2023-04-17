@@ -2,7 +2,6 @@ import os
 import configparser
 from snowflake.snowpark import Session
 from snowflake.snowpark.functions import *
-from data_diff import connect_to_table, diff_tables
 import pandas as pd
 import streamlit as st
 
