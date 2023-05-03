@@ -113,5 +113,6 @@ with st.sidebar:
     conn = sfAccount_selector(acc_select)
     session = session_builder(conn)
     table = table_choice(session, 'a', 0)
-st.line_chart(table['snowflake_table'],x = table['columns'][0],y = table['columns'][1])
+if table is not None:
+    st.line_chart(table['snowflake_table'],x = table['columns'][0],y = table['columns'][1])
 
