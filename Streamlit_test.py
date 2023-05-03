@@ -101,13 +101,17 @@ def table_choice(session, value, index):
     tb_select = st.selectbox('Choose {} table'.format(value),(tables))
     conn["table"] = tb_select
     snowflake_table = session.sql('select * from {}.{}.{};'.format(db_select,sc_select,tb_select)).toPandas()
-    return {'snowflake_table':snowflake_table, 'database':db_select, 'schema': sc_select, 'table':tb_select}
+    columns = session.sql('desc table {}.{}.{};'.format(db_select,sc_select,tb_select)).collect()
+    columns = [list(row.asDict().values())[0] for row in columns]
+    columns_disp = st.multiselect('Select columns to display',columns)
+    return {'snowflake_table':snowflake_table, 'database':db_select, 'schema': sc_select, 'table':tb_select, 'columns':columns_disp}
 
 
 
-acc_select = st.selectbox('Choose account',(accounts))
-conn = sfAccount_selector(acc_select)
-session = session_builder(conn)
-table = table_choice(session, 'a', 0)
-st.table(table['snowflake_table'])
+with st.sidebar:
+    acc_select = st.selectbox('Choose account',(accounts))
+    conn = sfAccount_selector(acc_select)
+    session = session_builder(conn)
+    table = table_choice(session, 'a', 0)
+st.line_chart(table['snowflake_table'],x = table['columns'][0],y = table['columns'][1])
 
