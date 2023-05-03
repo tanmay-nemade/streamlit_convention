@@ -100,10 +100,10 @@ def table_choice(session, value, index):
     tables = tables_list(db_select,sc_select, session)
     tb_select = st.selectbox('Choose {} table'.format(value),(tables))
     conn["table"] = tb_select
-    snowflake_table = session.sql('select * from {}.{}.{};'.format(db_select,sc_select,tb_select)).collect()
+    snowflake_table = session.sql('select * from {}.{}.{};'.format(db_select,sc_select,tb_select)).toPandas()
     columns = session.sql('desc table {}.{}.{};'.format(db_select,sc_select,tb_select)).collect()
     columns = [list(row.asDict().values())[0] for row in columns]
-    columns_disp = st.multiselect('Select columns to display',columns)
+    columns_disp = st.multiselect('Select any 2 columns to display',columns)
     return {'snowflake_table':snowflake_table, 'database':db_select, 'schema': sc_select, 'table':tb_select, 'columns':columns_disp}
 
 
@@ -113,6 +113,10 @@ with st.sidebar:
     conn = sfAccount_selector(acc_select)
     session = session_builder(conn)
     table = table_choice(session, 'a', 0)
-if table is not None:
+
+if len(table['columns']) == 2:
     st.line_chart(table['snowflake_table'],x = table['columns'][0],y = table['columns'][1])
+
+if len(table['columns']) > 2:
+    st.markdown('You have selected more than 2 columns')
 
