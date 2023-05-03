@@ -100,7 +100,7 @@ def table_choice(session, value, index):
     tables = tables_list(db_select,sc_select, session)
     tb_select = st.selectbox('Choose {} table'.format(value),(tables))
     conn["table"] = tb_select
-    snowflake_table = session.sql('select * from {}.{}.{};'.format(db_select,sc_select,tb_select)).toPandas()
+    snowflake_table = session.sql('select * from {}.{}.{};'.format(db_select,sc_select,tb_select)).collect()
     columns = session.sql('desc table {}.{}.{};'.format(db_select,sc_select,tb_select)).collect()
     columns = [list(row.asDict().values())[0] for row in columns]
     columns_disp = st.multiselect('Select any 2 columns to display',columns)
